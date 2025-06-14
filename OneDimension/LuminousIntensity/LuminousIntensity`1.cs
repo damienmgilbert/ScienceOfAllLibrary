@@ -6,8 +6,7 @@ using System.Linq;
 using System.Numerics;
 
 namespace ScienceOfAllLibrary.OneDimension.LuminousIntensity;
-
-public class LuminousIntensity<T> : PhysicalUnit<T, LuminousIntensityUnits> where T : INumber<T>, new()
+public class LuminousIntensity<T> : BaseUnitType<T, LuminousIntensityUnits>, ILuminousIntesity<T> where T : INumber<T>, new()
 {
     public override T Value { get; set; } = T.Zero; // Default value is zero
     public override LuminousIntensityUnits Units { get; set; } = LuminousIntensityUnits.Candela; // Default unit is Candela
@@ -15,6 +14,12 @@ public class LuminousIntensity<T> : PhysicalUnit<T, LuminousIntensityUnits> wher
     public override string Symbol { get; set; } = "cd"; // Symbol for candela
     public override string Description { get; set; } = "Unit of luminous intensity in the International System of Units (SI).";
     public override LuminousIntensityUnits BaseUnit { get; set; } = LuminousIntensityUnits.Candela;
+    public override DimensionType Dimension { get; set; } = DimensionType.LuminousIntensity; // Dimension type for luminous intensity
+
+    public LuminousIntensity()
+    {
+
+    }
     public LuminousIntensity(T value)
     {
         Value = value; // Initialize with a value
@@ -23,30 +28,39 @@ public class LuminousIntensity<T> : PhysicalUnit<T, LuminousIntensityUnits> wher
     {
         Units = units;
     }
-    public override T ConvertToBaseUnit()
+
+    public ILuminousIntesity<T> ConvertFrom(LuminousIntensityUnits units)
     {
-        return Units switch
+        var baseValue = this.ConvertToBaseUnit(); // Ensure the value is in base unit before conversion
+        return units switch
         {
-            LuminousIntensityUnits.Candela => Value, // No conversion needed for base unit
-            LuminousIntensityUnits.LumenPerSteradian => Value / T.CreateChecked(1), // Conversion logic for Lumen per Steradian (1 cd = 1 lm/sr)
-            LuminousIntensityUnits.Nit => Value / T.CreateChecked(1), // Conversion logic for Nit (1 cd/m² = 1 nit)
-            LuminousIntensityUnits.Lumen => Value / T.CreateChecked(1), // Conversion logic for Lumen (1 cd = 1 lm)
-            _ => throw new NotImplementedException($"Conversion from {Units} to base unit is not implemented.")
+            LuminousIntensityUnits.Candela => new LuminousIntensity<T> { Value = baseValue.Value, Units = LuminousIntensityUnits.Candela },
+            LuminousIntensityUnits.LumenPerSteradian => new LuminousIntensity<T> { Value = baseValue.Value * T.CreateChecked(4 * Math.PI), Units = LuminousIntensityUnits.LumenPerSteradian },
+            LuminousIntensityUnits.Nit => new LuminousIntensity<T> { Value = baseValue.Value * T.CreateChecked(Math.PI), Units = LuminousIntensityUnits.Nit },
+            _ => throw new NotImplementedException($"Conversion from {units} to base unit is not implemented.")
         };
     }
-    public override void ConvertToUnits(LuminousIntensityUnits newUnits)
+
+    public ILuminousIntesity<T> ConvertToBaseUnit()
     {
-        if (newUnits == Units) return; // No conversion needed if the units are the same
-        // For luminous intensity, only Candela is the base unit, so no conversion logic needed for other units
-        T baseValue = ConvertToBaseUnit(); // Convert to base unit first
-        Value = newUnits switch
+        return this.Units switch
         {
-            LuminousIntensityUnits.Candela => baseValue, // No conversion needed for base unit
-            LuminousIntensityUnits.LumenPerSteradian => baseValue * T.CreateChecked(1), // Convert from Candela to Lumen per Steradian (1 cd = 1 lm/sr)
-            LuminousIntensityUnits.Nit => baseValue * T.CreateChecked(1), // Convert from Candela to Nit (1 cd/m² = 1 nit)
-            LuminousIntensityUnits.Lumen => baseValue * T.CreateChecked(1), // Convert from Candela to Lumen (1 cd = 1 lm)
-            _ => throw new NotImplementedException($"Conversion to {newUnits} is not implemented.")
+            LuminousIntensityUnits.Candela => new LuminousIntensity<T> { Value = this.Value, Units = LuminousIntensityUnits.Candela },
+            LuminousIntensityUnits.LumenPerSteradian => new LuminousIntensity<T> { Value = this.Value / T.CreateChecked(4 * Math.PI), Units = LuminousIntensityUnits.Candela },
+            LuminousIntensityUnits.Nit => new LuminousIntensity<T> { Value = this.Value / T.CreateChecked(Math.PI), Units = LuminousIntensityUnits.Candela },
+            _ => throw new NotImplementedException($"Conversion from {this.Units} to base unit is not implemented.")
         };
-        Units = newUnits; // Update the units after conversion
+    }
+
+    public ILuminousIntesity<T> ConvertTo(LuminousIntensityUnits units)
+    {
+        var baseValue = this.ConvertToBaseUnit(); // Ensure the value is in base unit before conversion
+        return units switch
+        {
+            LuminousIntensityUnits.Candela => new LuminousIntensity<T> { Value = baseValue.Value, Units = LuminousIntensityUnits.Candela },
+            LuminousIntensityUnits.LumenPerSteradian => new LuminousIntensity<T> { Value = baseValue.Value * T.CreateChecked(4 * Math.PI), Units = LuminousIntensityUnits.LumenPerSteradian },
+            LuminousIntensityUnits.Nit => new LuminousIntensity<T> { Value = baseValue.Value * T.CreateChecked(Math.PI), Units = LuminousIntensityUnits.Nit },
+            _ => throw new NotImplementedException($"Conversion to {units} is not implemented.")
+        };
     }
 }

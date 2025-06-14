@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace ScienceOfAllLibrary.OneDimension.ElectricCurrent;
 
-public class ElectricCurrent<T> : PhysicalUnit<T, ElectricCurrentUnits> where T : INumber<T>, new()
+public class ElectricCurrent<T> : BaseUnitType<T, ElectricCurrentUnits>, IElectricCurrent<T> where T : INumber<T>, new()
 {
     public override T Value { get; set; } = T.Zero; // Default value is zero
     public override ElectricCurrentUnits Units { get; set; } = ElectricCurrentUnits.Ampere; // Default unit is Ampere
@@ -15,6 +15,13 @@ public class ElectricCurrent<T> : PhysicalUnit<T, ElectricCurrentUnits> where T 
     public override string Symbol { get; set; } = "A"; // Symbol for amperes
     public override string Description { get; set; } = "Unit of electric current in the International System of Units (SI).";
     public override ElectricCurrentUnits BaseUnit { get; set; } = ElectricCurrentUnits.Ampere;
+    public override DimensionType Dimension { get; set; } = DimensionType.ElectricCurrent;
+
+    public ElectricCurrent()
+    {
+        // Default constructor
+    }
+
     public ElectricCurrent(T value)
     {
         Value = value; // Initialize with a value
@@ -23,33 +30,39 @@ public class ElectricCurrent<T> : PhysicalUnit<T, ElectricCurrentUnits> where T 
     {
         Units = units;
     }
-    public override T ConvertToBaseUnit()
+
+    public IElectricCurrent<T> ConvertFrom(ElectricCurrentUnits units)
     {
-        return Units switch
+        var baseValue = this.ConvertToBaseUnit(); // Ensure the value is in base unit before conversion
+        return units switch
         {
-            ElectricCurrentUnits.Ampere => Value, // No conversion needed for base unit
-            ElectricCurrentUnits.Milliampere => Value / T.CreateChecked(1000), // Convert milliamperes to amperes
-            ElectricCurrentUnits.Microampere => Value / T.CreateChecked(1000000), // Convert microamperes to amperes
-            ElectricCurrentUnits.Kiloampere => Value * T.CreateChecked(1000), // Convert kiloamperes to amperes
-            ElectricCurrentUnits.Megaampere => Value * T.CreateChecked(1000000), // Convert megaamperes to amperes
-            _ => throw new NotImplementedException($"Conversion from {Units} to base unit is not implemented.")
+            ElectricCurrentUnits.Ampere => new ElectricCurrent<T> { Value = baseValue.Value, Units = ElectricCurrentUnits.Ampere },
+            ElectricCurrentUnits.Milliampere => new ElectricCurrent<T> { Value = baseValue.Value * T.CreateChecked(1000), Units = ElectricCurrentUnits.Milliampere },
+            ElectricCurrentUnits.Kiloampere => new ElectricCurrent<T> { Value = baseValue.Value / T.CreateChecked(1000), Units = ElectricCurrentUnits.Kiloampere },
+            _ => throw new NotImplementedException($"Conversion from {units} to base unit is not implemented.")
         };
     }
-    public override void ConvertToUnits(ElectricCurrentUnits newUnits)
+
+    public IElectricCurrent<T> ConvertToBaseUnit()
     {
-        if (newUnits == Units) return; // No conversion needed if the units are the same
-        // Convert current value to base unit first
-        T baseValue = ConvertToBaseUnit();
-        // Then convert from base unit to the new units
-        Value = newUnits switch
+        return this.Units switch
         {
-            ElectricCurrentUnits.Ampere => baseValue, // No conversion needed for base unit
-            ElectricCurrentUnits.Milliampere => baseValue * T.CreateChecked(1000), // Convert amperes to milliamperes
-            ElectricCurrentUnits.Microampere => baseValue * T.CreateChecked(1000000), // Convert amperes to microamperes
-            ElectricCurrentUnits.Kiloampere => baseValue / T.CreateChecked(1000), // Convert amperes to kiloamperes
-            ElectricCurrentUnits.Megaampere => baseValue / T.CreateChecked(1000000), // Convert amperes to megaamperes
-            _ => throw new NotImplementedException($"Conversion to {newUnits} is not implemented.")
+            ElectricCurrentUnits.Ampere => new ElectricCurrent<T> { Value = this.Value, Units = ElectricCurrentUnits.Ampere },
+            ElectricCurrentUnits.Milliampere => new ElectricCurrent<T> { Value = this.Value / T.CreateChecked(1000), Units = ElectricCurrentUnits.Milliampere },
+            ElectricCurrentUnits.Kiloampere => new ElectricCurrent<T> { Value = this.Value * T.CreateChecked(1000), Units = ElectricCurrentUnits.Kiloampere },
+            _ => throw new NotImplementedException($"Conversion from {this.Units} to base unit is not implemented.")
         };
-        Units = newUnits; // Update the units after conversion
+    }
+
+    public IElectricCurrent<T> ConvertTo(ElectricCurrentUnits units)
+    {
+        var baseValue = this.ConvertToBaseUnit(); // Ensure the value is in base unit before conversion
+        return units switch
+        {
+            ElectricCurrentUnits.Ampere => new ElectricCurrent<T> { Value = baseValue.Value, Units = ElectricCurrentUnits.Ampere },
+            ElectricCurrentUnits.Milliampere => new ElectricCurrent<T> { Value = baseValue.Value / T.CreateChecked(1000), Units = ElectricCurrentUnits.Milliampere },
+            ElectricCurrentUnits.Kiloampere => new ElectricCurrent<T> { Value = baseValue.Value * T.CreateChecked(1000), Units = ElectricCurrentUnits.Kiloampere },
+            _ => throw new NotImplementedException($"Conversion to {units} is not implemented.")
+        };
     }
 }

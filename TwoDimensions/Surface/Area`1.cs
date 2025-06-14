@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace ScienceOfAllLibrary.TwoDimensions.Surface;
 
-public class Area<T> : PhysicalUnit<T, AreaUnits> where T : INumber<T>, new()
+public class Area<T> : BaseUnitType<T, AreaUnits>, IArea<T> where T : INumber<T>, new()
 {
     public override T Value { get; set; } = T.Zero; // Default value is zero
     public override AreaUnits Units { get; set; } = AreaUnits.SquareMeter; // Default unit is Square Meter
@@ -16,6 +16,9 @@ public class Area<T> : PhysicalUnit<T, AreaUnits> where T : INumber<T>, new()
     public override string Symbol { get; set; } = "m²"; // Symbol for square meters
     public override string Description { get; set; } = "Unit of area in the metric system.";
     public override AreaUnits BaseUnit { get; set; } = AreaUnits.SquareMeter; // Base unit for area is Square Meter
+    public Area()
+    {
+    }
     public Area(T value)
     {
         Value = value; // Initialize with a value
@@ -24,51 +27,54 @@ public class Area<T> : PhysicalUnit<T, AreaUnits> where T : INumber<T>, new()
     {
         Units = units;
     }
-    public override T ConvertToBaseUnit()
+
+    public IArea<T> ConvertFrom(AreaUnits units)
     {
-        return Units switch
+        var baseArea = this.ConvertToBaseUnit(); // Ensure the value is in base unit before conversion
+        return units switch
         {
-            AreaUnits.SquareMeter => Value, // No conversion needed for base unit
-            AreaUnits.SquareKilometer => Value * T.CreateChecked(1_000_000), // Convert square kilometers to square meters
-            AreaUnits.SquareCentimeter => Value / T.CreateChecked(10_000), // Convert square centimeters to square meters
-            AreaUnits.SquareMillimeter => Value / T.CreateChecked(1_000_000), // Convert square millimeters to square meters
-            AreaUnits.SquareInch => Value * T.CreateChecked(0.00064516), // Convert square inches to square meters
-            AreaUnits.SquareFoot => Value * T.CreateChecked(0.092903), // Convert square feet to square meters
-            AreaUnits.SquareYard => Value * T.CreateChecked(0.836127), // Convert square yards to square meters
-            AreaUnits.Hectare => Value * T.CreateChecked(10_000), // Convert hectares to square meters
-            AreaUnits.Acre => Value * T.CreateChecked(4046.86), // Convert acres to square meters
-            AreaUnits.SquareMile => Value * T.CreateChecked(2_589_988), // Convert square miles to square meters
-            AreaUnits.SquareDecimeter => Value / T.CreateChecked(100), // Convert square decimeters to square meters
-            AreaUnits.SquareMicrometer => Value / T.CreateChecked(1_000_000_000), // Convert square micrometers to square meters
-            AreaUnits.SquareNanometer => Value / T.CreateChecked(1_000_000_000_000_000), // Convert square nanometers to square meters
-            AreaUnits.SquarePicometer => Value / T.CreateChecked(1_000_000_000_000_000_000), // Convert square picometers to square meters
-            _ => throw new NotImplementedException($"Conversion from {Units} to base unit is not implemented.")
+            AreaUnits.SquareMeter => new Area<T> { Value = baseArea.Value, Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareKilometer => new Area<T> { Value = baseArea.Value / T.CreateChecked(1_000_000), Units = AreaUnits.SquareKilometer },
+            AreaUnits.SquareCentimeter => new Area<T> { Value = baseArea.Value * T.CreateChecked(10_000), Units = AreaUnits.SquareCentimeter },
+            AreaUnits.SquareMillimeter => new Area<T> { Value = baseArea.Value * T.CreateChecked(1_000_000), Units = AreaUnits.SquareMillimeter },
+            AreaUnits.SquareInch => new Area<T> { Value = baseArea.Value / T.CreateChecked(0.00064516), Units = AreaUnits.SquareInch },
+            AreaUnits.SquareFoot => new Area<T> { Value = baseArea.Value / T.CreateChecked(0.092903), Units = AreaUnits.SquareFoot },
+            AreaUnits.SquareYard => new Area<T> { Value = baseArea.Value / T.CreateChecked(0.836127), Units = AreaUnits.SquareYard },
+            AreaUnits.Hectare => new Area<T> { Value = baseArea.Value / T.CreateChecked(10_000), Units = AreaUnits.Hectare },
+            AreaUnits.Acre => new Area<T> { Value = baseArea.Value / T.CreateChecked(4046.86), Units = AreaUnits.Acre },
+            AreaUnits.SquareMile => new Area<T> { Value = baseArea.Value / T.CreateChecked(2_589_988), Units = AreaUnits.SquareMile },
+            AreaUnits.SquareDecimeter => new Area<T> { Value = baseArea.Value * T.CreateChecked(100), Units = AreaUnits.SquareDecimeter },
+            AreaUnits.SquareMicrometer => new Area<T> { Value = baseArea.Value * T.CreateChecked(1_000_000_000), Units = AreaUnits.SquareMicrometer },
+            AreaUnits.SquareNanometer => new Area<T> { Value = baseArea.Value * T.CreateChecked(1_000_000_000_000_000), Units = AreaUnits.SquareNanometer },
+            AreaUnits.SquarePicometer => new Area<T> { Value = baseArea.Value * T.CreateChecked(1_000_000_000_000_000_000), Units = AreaUnits.SquarePicometer },
+            _ => throw new NotImplementedException("Conversion for the specified unit is not implemented.")
+            };
+    }
+
+    public IArea<T> ConvertToBaseUnit()
+    {
+        return this.Units switch
+        {
+            AreaUnits.SquareMeter => new Area<T> { Value = this.Value, Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareKilometer => new Area<T> { Value = this.Value * T.CreateChecked(1_000_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareCentimeter => new Area<T> { Value = this.Value / T.CreateChecked(10_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareMillimeter => new Area<T> { Value = this.Value / T.CreateChecked(1_000_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareInch => new Area<T> { Value = this.Value * T.CreateChecked(0.00064516), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareFoot => new Area<T> { Value = this.Value * T.CreateChecked(0.092903), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareYard => new Area<T> { Value = this.Value * T.CreateChecked(0.836127), Units = AreaUnits.SquareMeter },
+            AreaUnits.Hectare => new Area<T> { Value = this.Value * T.CreateChecked(10_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.Acre => new Area<T> { Value = this.Value * T.CreateChecked(4046.86), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareMile => new Area<T> { Value = this.Value * T.CreateChecked(2_589_988), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareDecimeter => new Area<T> { Value = this.Value / T.CreateChecked(100), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareMicrometer => new Area<T> { Value = this.Value / T.CreateChecked(1_000_000_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquareNanometer => new Area<T> { Value = this.Value / T.CreateChecked(1_000_000_000_000_000), Units = AreaUnits.SquareMeter },
+            AreaUnits.SquarePicometer => new Area<T> { Value = this.Value / T.CreateChecked(1_000_000_000_000_000_000), Units = AreaUnits.SquareMeter },
+            _ => throw new NotImplementedException("Conversion for the specified unit is not implemented.")
         };
     }
-    public override void ConvertToUnits(AreaUnits newUnits)
+
+    public IArea<T> ConvertTo(AreaUnits units)
     {
-        if (newUnits == Units) return; // No conversion needed if the units are the same
-        // Convert current value to base unit first
-        T baseValue = ConvertToBaseUnit();
-        // Then convert from base unit to the new units
-        Value = newUnits switch
-        {
-            AreaUnits.SquareMeter => baseValue, // No conversion needed for base unit
-            AreaUnits.SquareKilometer => baseValue / T.CreateChecked(1_000_000), // Convert square meters to square kilometers
-            AreaUnits.SquareCentimeter => baseValue * T.CreateChecked(10_000), // Convert square meters to square centimeters
-            AreaUnits.SquareMillimeter => baseValue * T.CreateChecked(1_000_000), // Convert square meters to square millimeters
-            AreaUnits.SquareInch => baseValue / T.CreateChecked(0.00064516), // Convert square meters to square inches
-            AreaUnits.SquareFoot => baseValue / T.CreateChecked(0.092903), // Convert square meters to square feet
-            AreaUnits.SquareYard => baseValue / T.CreateChecked(0.836127), // Convert square meters to square yards
-            AreaUnits.Hectare => baseValue / T.CreateChecked(10_000), // Convert square meters to hectares
-            AreaUnits.Acre => baseValue / T.CreateChecked(4046.86), // Convert square meters to acres
-            AreaUnits.SquareMile => baseValue / T.CreateChecked(2_589_988), // Convert square meters to square miles
-            AreaUnits.SquareDecimeter => baseValue * T.CreateChecked(100), // Convert square meters to square decimeters
-            AreaUnits.SquareMicrometer => baseValue * T.CreateChecked(1_000_000_000), // Convert square meters to square micrometers
-            AreaUnits.SquareNanometer => baseValue * T.CreateChecked(1_000_000_000_000_000), // Convert square meters to square nanometers
-            AreaUnits.SquarePicometer => baseValue * T.CreateChecked(1_000_000_000_000_000_000), // Convert square meters to square picometers
-            _ => throw new NotImplementedException($"Conversion to {newUnits} is not implemented.")
-        };
-        Units = newUnits; // Update the units after conversion
+        throw new NotImplementedException();
     }
 }

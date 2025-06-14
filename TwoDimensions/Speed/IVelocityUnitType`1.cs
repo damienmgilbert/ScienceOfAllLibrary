@@ -2,10 +2,11 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 
 namespace ScienceOfAllLibrary.TwoDimensions.Speed;
 
-public interface IVelocityUnitType : IBaseUnitType<VelocityUnits>
+public interface IVelocityUnitType<T> : IBaseUnitType<T, VelocityUnits> where T : INumber<T>, new()
 {
     // This interface can be extended with additional properties or methods specific to velocity units
 }

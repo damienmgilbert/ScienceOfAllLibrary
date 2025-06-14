@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 using ScienceOfAllLibrary.OneDimension.Units;
 
 namespace ScienceOfAllLibrary.OneDimension.Temperature;
-public interface ITemperatureUnitType : IBaseUnitType<TemperatureUnits>
+public interface ITemperatureUnitType<T> : IBaseUnitType<T, TemperatureUnits> where T : INumber<T>
 {
 }

@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace ScienceOfAllLibrary.TwoDimensions.Speed;
 
-public class Velocity<T> : PhysicalUnit<T, VelocityUnits> where T : INumber<T>, new()
+public class Velocity<T> : BaseUnitType<T, VelocityUnits>, IVelocity<T> where T : INumber<T>, new()
 {
     public override T Value { get; set; } = T.Zero; // Default value is zero
     public override VelocityUnits Units { get; set; } = VelocityUnits.MetersPerSecond; // Default unit is MetersPerSecond
@@ -14,6 +14,11 @@ public class Velocity<T> : PhysicalUnit<T, VelocityUnits> where T : INumber<T>, 
     public override string Symbol { get; set; } = "m/s"; // Symbol for meters per second
     public override string Description { get; set; } = "Unit of velocity in the metric system.";
     public override VelocityUnits BaseUnit { get; set; } = VelocityUnits.MetersPerSecond;
+
+    public Velocity()
+    {
+        // Default constructor
+    }
     public Velocity(T value)
     {
         Value = value; // Initialize with a value
@@ -22,40 +27,61 @@ public class Velocity<T> : PhysicalUnit<T, VelocityUnits> where T : INumber<T>, 
     {
         Units = units;
     }
-    public override T ConvertToBaseUnit()
+
+    public IVelocity<T> ConvertFrom(VelocityUnits units)
     {
-        return Units switch
+        var baseVelocity = this.ConvertToBaseUnit(); // Convert to base unit (meters per second)
+        return units switch
         {
-            VelocityUnits.MetersPerSecond => Value, // No conversion needed for base unit
-            VelocityUnits.KilometersPerHour => Value / T.CreateChecked(3.6), // Convert km/h to m/s
-            VelocityUnits.MilesPerHour => Value / T.CreateChecked(2.236936), // Convert mph to m/s
-            VelocityUnits.FeetPerSecond => Value / T.CreateChecked(3.28084), // Convert ft/s to m/s
-            VelocityUnits.Knots => Value / T.CreateChecked(1.943844), // Convert knots to m/s
-            VelocityUnits.CentimetersPerSecond => Value / T.CreateChecked(100), // Convert cm/s to m/s
-            VelocityUnits.MillimetersPerSecond => Value / T.CreateChecked(1000), // Convert mm/s to m/s
-            VelocityUnits.InchesPerSecond => Value / T.CreateChecked(39.3701), // Convert in/s to m/s
-            _ => throw new NotImplementedException($"Conversion from {Units} to base unit is not implemented.")
+            VelocityUnits.MetersPerSecond => new Velocity<T> { Value = baseVelocity.Value, Units = VelocityUnits.MetersPerSecond },
+            VelocityUnits.KilometersPerHour => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(3.6), Units = VelocityUnits.KilometersPerHour },
+            VelocityUnits.MilesPerHour => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(2.237), Units = VelocityUnits.MilesPerHour },
+            VelocityUnits.FeetPerSecond => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(3.281), Units = VelocityUnits.FeetPerSecond },
+            VelocityUnits.Knots => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(1.944), Units = VelocityUnits.Knots },
+            VelocityUnits.CentimetersPerSecond => new Velocity<T> { Value = baseVelocity.Value / T.CreateChecked(100), Units = VelocityUnits.CentimetersPerSecond },
+            VelocityUnits.MillimetersPerSecond => new Velocity<T> { Value = baseVelocity.Value / T.CreateChecked(1000), Units = VelocityUnits.MillimetersPerSecond },
+            VelocityUnits.InchesPerSecond => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(39.37), Units = VelocityUnits.InchesPerSecond },
+            VelocityUnits.Mach => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(343.2), Units = VelocityUnits.Mach }, // Speed of sound at sea level in m/s
+            VelocityUnits.SpeedOfLight => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(299792458), Units = VelocityUnits.SpeedOfLight }, // Speed of light in m/s
+            _ => throw new NotImplementedException("Conversion for the specified unit is not implemented.")
         };
     }
-    public override void ConvertToUnits(VelocityUnits newUnits)
-    {
-        if (newUnits == Units) return; // No conversion needed if the units are the same
-        // Convert current value to base unit first
-        T baseValue = ConvertToBaseUnit();
 
-        // Then convert from base unit to the new units
-        Value = newUnits switch
+    public IVelocity<T> ConvertToBaseUnit()
+    {
+        var baseValue = this.ConvertToBaseUnit(); // Convert to base unit (meters per second)
+        return this.Units switch
         {
-            VelocityUnits.MetersPerSecond => baseValue, // No conversion needed for base unit
-            VelocityUnits.KilometersPerHour => baseValue * T.CreateChecked(3.6), // Convert m/s to km/h
-            VelocityUnits.MilesPerHour => baseValue * T.CreateChecked(2.236936), // Convert m/s to mph
-            VelocityUnits.FeetPerSecond => baseValue * T.CreateChecked(3.28084), // Convert m/s to ft/s
-            VelocityUnits.Knots => baseValue * T.CreateChecked(1.943844), // Convert m/s to knots
-            VelocityUnits.CentimetersPerSecond => baseValue * T.CreateChecked(100), // Convert m/s to cm/s
-            VelocityUnits.MillimetersPerSecond => baseValue * T.CreateChecked(1000), // Convert m/s to mm/s
-            VelocityUnits.InchesPerSecond => baseValue * T.CreateChecked(39.3701), // Convert m/s to in/s
-            _ => throw new NotImplementedException($"Conversion to {newUnits} is not implemented.")
+            VelocityUnits.MetersPerSecond => new Velocity<T> { Value = baseValue.Value, Units = VelocityUnits.MetersPerSecond },
+            VelocityUnits.KilometersPerHour => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(3.6), Units = VelocityUnits.KilometersPerHour },
+            VelocityUnits.MilesPerHour => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(2.237), Units = VelocityUnits.MilesPerHour },
+            VelocityUnits.FeetPerSecond => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(3.281), Units = VelocityUnits.FeetPerSecond },
+            VelocityUnits.Knots => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(1.944), Units = VelocityUnits.Knots },
+            VelocityUnits.CentimetersPerSecond => new Velocity<T> { Value = baseValue.Value * T.CreateChecked(100), Units = VelocityUnits.CentimetersPerSecond },
+            VelocityUnits.MillimetersPerSecond => new Velocity<T> { Value = baseValue.Value * T.CreateChecked(1000), Units = VelocityUnits.MillimetersPerSecond },
+            VelocityUnits.InchesPerSecond => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(39.37), Units = VelocityUnits.InchesPerSecond },
+            VelocityUnits.Mach => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(343.2), Units = VelocityUnits.Mach }, // Speed of sound at sea level in m/s
+            VelocityUnits.SpeedOfLight => new Velocity<T> { Value = baseValue.Value / T.CreateChecked(299792458), Units = VelocityUnits.SpeedOfLight }, // Speed of light in m/s
+            _ => throw new NotImplementedException("Conversion for the specified unit is not implemented.")
         };
-        Units = newUnits; // Update the units after conversion
+    }
+
+    public IVelocity<T> ConvertTo(VelocityUnits units)
+    {
+        var baseVelocity = this.ConvertToBaseUnit(); // Convert to base unit (meters per second)
+        return units switch
+        {
+            VelocityUnits.MetersPerSecond => new Velocity<T> { Value = baseVelocity.Value, Units = VelocityUnits.MetersPerSecond },
+            VelocityUnits.KilometersPerHour => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(3.6), Units = VelocityUnits.KilometersPerHour },
+            VelocityUnits.MilesPerHour => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(2.237), Units = VelocityUnits.MilesPerHour },
+            VelocityUnits.FeetPerSecond => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(3.281), Units = VelocityUnits.FeetPerSecond },
+            VelocityUnits.Knots => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(1.944), Units = VelocityUnits.Knots },
+            VelocityUnits.CentimetersPerSecond => new Velocity<T> { Value = baseVelocity.Value / T.CreateChecked(100), Units = VelocityUnits.CentimetersPerSecond },
+            VelocityUnits.MillimetersPerSecond => new Velocity<T> { Value = baseVelocity.Value / T.CreateChecked(1000), Units = VelocityUnits.MillimetersPerSecond },
+            VelocityUnits.InchesPerSecond => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(39.37), Units = VelocityUnits.InchesPerSecond },
+            VelocityUnits.Mach => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(343.2), Units = VelocityUnits.Mach }, // Speed of sound at sea level in m/s
+            VelocityUnits.SpeedOfLight => new Velocity<T> { Value = baseVelocity.Value * T.CreateChecked(299792458), Units = VelocityUnits.SpeedOfLight }, // Speed of light in m/s
+            _ => throw new NotImplementedException("Conversion for the specified unit is not implemented.")
+        };
     }
 }

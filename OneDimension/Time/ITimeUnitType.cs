@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 using ScienceOfAllLibrary.OneDimension.Units;
 
 namespace ScienceOfAllLibrary.OneDimension.Time;
-public interface ITimeUnitType : IBaseUnitType<TimeUnits>
+public interface ITimeUnitType<T> : IBaseUnitType<T, TimeUnits> where T : INumber<T>
 {
 }

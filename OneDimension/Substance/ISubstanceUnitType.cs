@@ -3,10 +3,11 @@
 using System;
 
 using System.Linq;
+using System.Numerics;
 
 namespace ScienceOfAllLibrary.OneDimension.Substance;
 
-public interface ISubstanceUnitType : IBaseUnitType<SubstanceUnits>
+public interface ISubstanceUnitType<T> : IBaseUnitType<T, SubstanceUnits> where T : INumber<T>
 {
     // Interface for Substance unit types, extending the base unit type interface
 }
