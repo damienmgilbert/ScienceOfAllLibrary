@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class QuectoPrefix : SIPrefixBase
+public class QuectoPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => -30;

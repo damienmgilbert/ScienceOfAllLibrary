@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class RonnaPrefix : SIPrefixBase
+public class RonnaPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => 27;

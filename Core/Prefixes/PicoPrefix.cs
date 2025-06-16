@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class PicoPrefix : SIPrefixBase
+public class PicoPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => -12;

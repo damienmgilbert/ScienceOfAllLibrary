@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class NanoPrefix : SIPrefixBase
+public class NanoPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => -9;

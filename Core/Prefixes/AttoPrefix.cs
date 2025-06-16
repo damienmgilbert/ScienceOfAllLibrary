@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
-public class AttoPrefix : SIPrefixBase
+public class AttoPrefix : BasePrefix
 {
 
     #region Public properties

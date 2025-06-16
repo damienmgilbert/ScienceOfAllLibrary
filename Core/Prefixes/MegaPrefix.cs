@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class MegaPrefix : SIPrefixBase
+public class MegaPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => 6;

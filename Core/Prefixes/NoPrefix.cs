@@ -9,12 +9,12 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class NonePrefix : SIPrefixBase
+public class NoPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => 0;
 
-    public override PrefixeType Prefix => PrefixeType.Base;
+    public override PrefixeType Prefix => PrefixeType.None;
     public override decimal DecimalValue => 1M;
 
     public override string Name => "None";

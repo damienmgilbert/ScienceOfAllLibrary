@@ -6,27 +6,13 @@
 //-----------------------------------------------------------------------
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
-public abstract class SIPrefixBase : ISIPrefixBase
-{
-
-    #region Public properties
-    public abstract double Base10Exponent { get; }
-    public abstract decimal DecimalValue { get; }
-    public abstract string Name { get; }
-    public abstract PrefixeType Prefix { get; }
-    public abstract string Symbol { get; }
-
-
-    #endregion
-}
 
 // this class should be able to convert a ISIPrefix to another ISIPrefix by finding the conversion factor
 public static class ISIPrefixBaseExtensions
 {
-    public static ISIPrefixBase ConvertTo(this ISIPrefixBase prefixBase, ISIPrefixBase toBase)
+    public static IPrefix ConvertTo(this IPrefix prefixBase, IPrefix toBase)
     {
         if (prefixBase == null) throw new ArgumentNullException(nameof(prefixBase));
         if (toBase == null) throw new ArgumentNullException(nameof(toBase));
@@ -36,12 +22,12 @@ public static class ISIPrefixBaseExtensions
         return new ConvertedSIPrefix(prefixBase, toBase, conversionFactor);
     }
 
-    private class ConvertedSIPrefix : ISIPrefixBase
+    private class ConvertedSIPrefix : IPrefix
     {
-        private readonly ISIPrefixBase _fromPrefix;
-        private readonly ISIPrefixBase _toPrefix;
+        private readonly IPrefix _fromPrefix;
+        private readonly IPrefix _toPrefix;
         private readonly decimal _conversionFactor;
-        public ConvertedSIPrefix(ISIPrefixBase fromPrefix, ISIPrefixBase toPrefix, decimal conversionFactor)
+        public ConvertedSIPrefix(IPrefix fromPrefix, IPrefix toPrefix, decimal conversionFactor)
         {
             _fromPrefix = fromPrefix ?? throw new ArgumentNullException(nameof(fromPrefix));
             _toPrefix = toPrefix ?? throw new ArgumentNullException(nameof(toPrefix));

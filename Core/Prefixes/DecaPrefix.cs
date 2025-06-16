@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
 
-public class DecaPrefix : SIPrefixBase
+public class DecaPrefix : BasePrefix
 {
     #region Public properties
     public override double Base10Exponent => 1;

@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 
 namespace ScienceOfAllLibrary.Core.Prefixes;
-public interface ISIPrefixBase
+public interface IPrefix
 {
 
     #region Public properties
