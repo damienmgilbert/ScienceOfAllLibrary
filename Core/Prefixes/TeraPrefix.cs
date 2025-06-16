@@ -1,0 +1,17 @@
+﻿//-----------------------------------------------------------------------
+// <copyright file="TeraPrefix.cs" company="">
+//     Author:  
+//     Copyright (c) . All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+using System;
+using System.Linq;
+
+namespace ScienceOfAllLibrary.Core.Prefixes;
+public class TeraPrefix : SIPrefixBase
+{
+    #region Public properties
+    public override double Base10Exponent => 12; public override decimal DecimalValue => 1e12M; public override string Name => "Tera"; public override string Symbol => "T";
+    #endregion
+
+}
